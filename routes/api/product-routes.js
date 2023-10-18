@@ -6,17 +6,38 @@ const { Product, Category, Tag, ProductTag } = require('../../models');
 // get all products
 router.get('/', (req, res) => {
   // find all products
+  Product.findAll()
+    .then(products => res.json(products))
+    .catch(err => console.log(err));
   // be sure to include its associated Category and Tag data
 });
 
 // get one product
 router.get('/:id', (req, res) => {
+  const productId = clientReq.params.id;
   // find a single product by its `id`
+  Product.findByPk(productId)
+  .then(product => {
+    serverRes.json(product || { message: 'Product not found with that id.' });
+  });
   // be sure to include its associated Category and Tag data
 });
 
 // create new product
 router.post('/', (req, res) => {
+  const data = req.body;
+
+  if (!data.product_name || !data.price || !data.stock ) {
+    return res.status(400).send({
+      message: 'product_name, price, and stock fields must be complete.'
+    })
+  }
+
+  for (let prop in data) {
+    const val = data[prop];
+    if (typeof val === 'string') data[prop] = val.trim();
+  }
+
   /* req.body should look like this...
     {
       product_name: "Basketball",
@@ -94,6 +115,13 @@ router.put('/:id', (req, res) => {
 
 router.delete('/:id', (req, res) => {
   // delete one product by its `id` value
+  const productId = req.params.id;
+
+  Product.destroy({
+    where: {
+      id: productId
+    }
+  }).then(() => res.json({ message: 'Product deleted successfully!' }));
 });
 
 module.exports = router;
