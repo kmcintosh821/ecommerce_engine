@@ -5,18 +5,18 @@ const { Tag, Product, ProductTag } = require('../../models');
 
 router.get('/', (req, res) => {
   // find all tags
-  Tag.findAll()
+  Tag.findAll({ include: [Product] })
   .then(tags => res.json(tags))
   .catch(err => console.log(err));
   // be sure to include its associated Product data
 });
 
 router.get('/:id', (req, res) => {
-  const tagId = clientReq.params.id;
+  const tagId = req.params.id;
   // find a single tag by its `id`
-  Tag.findByPk(tagId)
+  Tag.findByPk(tagId, { include: [Product] })
   .then(tag => {
-    serverRes.json(product || { message: 'Tag not found with that id.' });
+    res.json(tag || { message: 'Tag not found with that id.' });
   });
   // be sure to include its associated Product data
 });
@@ -52,7 +52,6 @@ router.put('/:id', (req, res) => {
     .then((product) => {
       return res.json(product);
     });
-    //Change tag name wherever it occurs in a product
 });
 
 router.delete('/:id', (req, res) => {
@@ -64,7 +63,6 @@ router.delete('/:id', (req, res) => {
       id: tagId
     }
   }).then(() => res.json({ message: 'Tag deleted successfully!' }));
-  // Remove tag from all products containing it
 });
 
 module.exports = router;
